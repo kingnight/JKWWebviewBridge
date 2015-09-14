@@ -1,0 +1,64 @@
+<html>
+<head>
+    <meta name='viewport'
+          content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
+</head>
+<body align='center' style="background-color:silver;" style="font-size:6px;">
+JKWWebviewBridge Demo
+<br/>
+
+<div id="statelist">
+    bridge not ready
+</div>
+<div id='buttons'></div>
+
+<script type="text/javascript">
+    function handleReadyState() {
+        document.getElementById("statelist").innerHTML = "bridge is ready";
+    }
+    function handleErrorState() {
+        document.getElementById("statelist").innerHTML = "window.WebViewJavascriptBridge not found";
+    }
+
+    //setTimeout(function(){
+    if (WebViewJavascriptBridge) {
+        handleReadyState();
+    }
+    else {
+        handleErrorState();
+    }
+
+    var button1 = document.getElementById('buttons').appendChild(document.createElement('button'))
+    button1.innerHTML = 'send Dict'
+    button1.onclick = function (e) {
+        e.preventDefault()
+        WebViewJavascriptBridge.send({ Foo: "Bar" });
+    }
+
+    var button2 = document.getElementById('buttons').appendChild(document.createElement('button'))
+    button2.innerHTML = 'send calback'
+    button2.onclick = function (e) {
+        e.preventDefault()
+        WebViewJavascriptBridge.send("test", function (responseData) {
+            console.log("callback from JS" + responseData);
+        });
+    }
+
+    var button3 = document.getElementById('buttons').appendChild(document.createElement('button'))
+    button3.innerHTML = 'call handler'
+    button3.onclick = function (e) {
+        e.preventDefault()
+        WebViewJavascriptBridge.callHandler("testObjcHandler",{'foo': 'bar'}, function(response) {
+                                            console.log('JS got response  '+response)
+                                            });
+    }
+
+    WebViewJavascriptBridge.registerHandler('testJavascriptHandler', function(data,responseCallback) {
+        console.log("testJavascriptHandler callback From OBJC");
+        responseCallback("data from JS");
+    });
+    
+    console.log('init');
+</script>
+</body>
+</html>
